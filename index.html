@@ -1,0 +1,461 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
+	<link rel="manifest" href="manifest.json">
+	<link rel="apple-touch-icon" href="logo-192.png">
+    <title>HappyHome Bills</title>  
+      
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">  
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">  
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">  
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>  
+      
+    <style>  
+        :root {  
+            /* === THEME COLORS === */  
+            --primary: #6366f1;         
+            --primary-dark: #4f46e5;  
+            --success: #10b981;         
+            --dark-text: #1e293b;  
+            --light-text: #64748b;  
+              
+            /* === GLASS THEME === */  
+            --glass-bg: rgba(255, 255, 255, 0.96);   
+            --glass-border: 1px solid rgba(255, 255, 255, 0.5);  
+            --glass-shadow: 0 4px 20px rgba(0,0,0,0.06);  
+            --radius: 12px; 
+        }  
+  
+        body {  
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);  
+            min-height: 100vh;  
+            font-family: 'Manrope', sans-serif;  
+            color: var(--dark-text);  
+            font-size: 0.85rem; 
+            padding-bottom: 90px; 
+            -webkit-font-smoothing: antialiased;  
+        }  
+
+        /* === FIREBASE AUTH OVERLAY STYLES === */
+        #password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 9999; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 20px; 
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+  
+        /* === HEADER === */  
+        .app-header {  
+            position: relative;
+            text-align: center;  
+            color: white;  
+            padding: 25px 15px 15px; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.15);  
+        }  
+        .app-title { font-weight: 800; font-size: 1.6rem; margin-bottom: 2px; letter-spacing: -1px; }  
+        .app-subtitle { font-weight: 500; opacity: 0.9; font-size: 0.9rem; }  
+  
+        /* === CARDS === */  
+        .card {  
+            background: var(--glass-bg);  
+            backdrop-filter: blur(20px);  
+            -webkit-backdrop-filter: blur(20px);  
+            border: var(--glass-border);  
+            border-radius: var(--radius);  
+            box-shadow: var(--glass-shadow);  
+            margin-bottom: 16px; 
+            border: none;  
+            overflow: hidden;  
+        }  
+          
+        .card-header {  
+            background: rgba(248, 250, 252, 0.6);  
+            border-bottom: 1px solid rgba(0,0,0,0.05);  
+            padding: 12px 15px; 
+            font-weight: 800;  
+            color: var(--primary-dark);  
+            font-size: 0.9rem;  
+            display: flex; justify-content: space-between; align-items: center;  
+        }  
+          
+        .card-body { padding: 15px; } 
+  
+        /* === INPUTS & BUTTONS === */  
+        .form-control, .form-select, .input-group-text, .btn {  
+            height: 42px; 
+            border-radius: 8px; 
+            font-size: 0.85rem;   
+        }  
+        .form-control {  
+            border: 2px solid #e2e8f0;  
+            padding-left: 12px;  
+            background: #fff;  
+            color: #0f172a;  
+            font-weight: 600;  
+        }  
+        .form-control:focus {  
+            border-color: var(--primary);  
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);  
+        }  
+        label {  
+            font-weight: 700;  
+            color: var(--light-text);  
+            font-size: 0.75rem;  
+            margin-bottom: 4px; 
+            text-transform: uppercase;  
+            letter-spacing: 0.5px;  
+        }  
+  
+        .btn { font-weight: 700; border: none; letter-spacing: 0.3px; font-size: 0.9rem; }  
+        .btn:active { transform: scale(0.97); }  
+        .btn-primary { background: var(--primary); }  
+        .btn-success { background: var(--success); }  
+        .btn-info { background: #0ea5e9; color: white; }  
+  
+        /* === TABS === */  
+        .nav-pills {  
+            background: rgba(255,255,255,0.25);  
+            padding: 4px;  
+            border-radius: 12px;  
+            display: inline-flex;  
+            margin-top: 10px;  
+            border: 1px solid rgba(255,255,255,0.2);  
+        }  
+        .nav-pills .nav-link {  
+            color: white;  
+            border-radius: 8px;  
+            padding: 6px 20px;  
+            font-weight: 700;  
+            font-size: 0.9rem;  
+        }  
+        .nav-pills .nav-link.active {  
+            background: white;  
+            color: var(--primary);  
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);  
+        }  
+  
+        /* === COMPACT SPREADSHEET UI FOR BILLS === */
+        .sheet-container { border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background: #fff; margin-bottom: 10px; }
+        .sheet-header { display: flex; background: #f1f5f9; font-size: 0.65rem; font-weight: 800; color: #64748b; padding: 4px 8px; border-bottom: 1px solid #cbd5e1; text-transform: uppercase; }
+        .sheet-header div:nth-child(1) { flex: 1; }
+        .sheet-header div:nth-child(2) { width: 80px; text-align: right; padding-right: 5px;}
+        
+        .sheet-row { display: flex; border-bottom: 1px solid #e2e8f0; }
+        .sheet-row:last-child { border-bottom: none; }
+        
+        .sheet-input { border: none; padding: 4px 8px; font-size: 0.8rem; font-weight: 600; color: #1e293b; background: transparent; outline: none; height: 28px; }
+        .sheet-input.bill-name { flex: 1; border-right: 1px solid #e2e8f0; }
+        .sheet-input.bill-amt { width: 80px; text-align: right; }
+        .sheet-input:focus { background: #f0fdf4; } 
+        
+        .sheet-btn { background: transparent; border: none; border-left: 1px solid #e2e8f0; width: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+        .sheet-btn:hover { background: #fee2e2; }
+        
+        .sheet-add-btn { width: 100%; background: #f8fafc; border: none; border-top: 1px dashed #cbd5e1; padding: 6px; font-size: 0.75rem; font-weight: 700; color: var(--primary); cursor: pointer; }
+        .sheet-add-btn:hover { background: #e0e7ff; }
+
+        .sheet-date-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+        .sheet-date-label { font-size: 0.7rem; font-weight: 800; color: var(--light-text); }
+        .sheet-date-input { flex: 1; height: 30px !important; padding: 0 8px !important; font-size: 0.75rem !important; border-radius: 6px !important; }
+        
+        /* === BREAKDOWN & HISTORY SPREADSHEET UI === */
+        .bd-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; background: #fff; min-width: 600px; }
+        .bd-table th { background: #f1f5f9; padding: 6px 8px; border: 1px solid #cbd5e1; border-top: none; text-transform: uppercase; color: #64748b; font-weight: 800; text-align: center; }
+        .bd-table td { padding: 0; border: 1px solid #e2e8f0; vertical-align: middle; position: relative; }
+        
+        .bd-table th:first-child, .bd-table td:first-child { border-left: none; text-align: left; padding-left: 10px; }
+        .bd-table th:last-child, .bd-table td:last-child { border-right: none; }
+        
+        .bd-table .sheet-input { width: 100%; height: 32px; border-radius: 0; font-size: 0.8rem; text-align: right; }
+        .bd-table .readonly-cell { background: #f8fafc; color: #475569; font-weight: 700; pointer-events: none; }
+        .bd-table .total-cell { color: var(--success); font-weight: 800; font-size: 0.95rem; background: #f0fdf4; pointer-events: none; }
+        
+        .date-cell-wrapper, .extra-cell-wrapper { display: flex; width: 100%; }
+        .date-cell-wrapper input { width: 50%; border-right: 1px dashed #e2e8f0; padding: 0 4px; text-align: center; }
+        .date-cell-wrapper input:last-child { border-right: none; }
+        
+        .extra-cell-wrapper input.note { flex: 1; border-right: 1px dashed #e2e8f0; text-align: left; }
+        .extra-cell-wrapper input.amt { width: 70px; }
+		
+		/* === HISTORY ROW HOVER EFFECT === */
+        .history-row { cursor: pointer; transition: all 0.2s ease; }
+        .history-row:hover { background-color: #f0fdf4 !important; }
+        .history-row:active { background-color: #dcfce7 !important; }
+        .history-period-text { font-weight: 700; color: #475569; display: flex; justify-content: space-between; align-items: center; transition: color 0.2s; }
+        .history-row:hover .history-period-text { color: var(--primary-dark); }
+        
+        .load-badge { opacity: 0; font-size: 0.65rem; background: #e0e7ff; color: var(--primary); padding: 2px 8px; border-radius: 6px; font-weight: 800; transform: translateX(-10px); transition: all 0.2s; pointer-events: none; }
+        .history-row:hover .load-badge { opacity: 1; transform: translateX(0); }
+		
+/* === MOBILE RESPONSIVE TABLES === */  
+        .table-responsive { border-radius: 10px; }  
+          
+        @media (max-width: 768px) {  
+            /* 1. Shrink global mobile font to 8px */
+            body { font-size: 8px; padding: 0 5px 90px; }
+            .card-body { padding: 8px; }
+            #dash .table-responsive, #report .table-responsive { padding: 0 !important; }  
+            
+            /* 2. Remove horizontal scroll forced-width on mobile */
+            .bd-table { min-width: 100%; font-size: 8px !important; }
+            
+            /* 3. Shrink the input fields and table cells to fit the 8px font */
+            .bd-table .sheet-input { font-size: 8px !important; height: 26px; padding: 2px 4px; }
+            .bd-table th { font-size: 8px !important; padding: 6px 4px; }
+            .bd-table .total-cell { font-size: 9px !important; } /* Just slightly bolder for the total */
+            .extra-cell-wrapper input.amt { width: 50px; } /* Shrink extra amount width */
+            
+            /* 4. Hide Dates Stayed (Col 2) and Status (Col 4) */
+            .bd-table th:nth-child(2), .bd-table td:nth-child(2),
+            .bd-table th:nth-child(4), .bd-table td:nth-child(4) {
+                display: none !important;
+            }
+        }
+  
+        /* === BADGES === */  
+        .status-badge {  
+            padding: 4px 10px;  
+            border-radius: 20px;  
+            font-size: 0.7rem;  
+            font-weight: 800;  
+            text-transform: uppercase;  
+            letter-spacing: 0.5px;  
+        }  
+        .status-full { background: #dcfce7; color: #15803d; }  
+        .status-partial { background: #fef9c3; color: #a16207; }  
+        .warning-date { border: 2px solid #f59e0b !important; background: #fffbeb; }  
+  
+        /* === STICKY FOOTER === */  
+        .sticky-footer {  
+            position: fixed;  
+            bottom: 0; left: 0; width: 100%;  
+            background: rgba(255, 255, 255, 0.95);  
+            backdrop-filter: blur(15px);  
+            padding: 12px 15px 20px;   
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);  
+            z-index: 1000;  
+            display: flex;  
+            gap: 10px;  
+            border-top: 1px solid rgba(0,0,0,0.05);  
+        }  
+        .d-md-none { display: none; }  
+        @media (max-width: 768px) { .d-md-none { display: flex; } }  
+  
+        /* === RECEIPT CARD UI (MODAL) === */  
+        .receipt-card {  
+            background: white; border-radius: 12px; overflow: hidden; margin-bottom: 15px;  
+            border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.05);  
+        }  
+        .receipt-header {  
+            background: #f8fafc; padding: 15px; border-bottom: 1px dashed #cbd5e1;  
+            display: flex; justify-content: space-between; align-items: center;  
+        }  
+        .receipt-body { padding: 15px; }  
+        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 6px; color: #475569; font-size: 11px; }  
+        .receipt-row.total {   
+            margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e2e8f0;  
+            color: var(--primary); font-weight: 800; font-size: 1.2rem;  
+        }  
+        .receipt-actions { padding: 12px 15px; background: #f8fafc; text-align: center; }  
+  
+        #loading-overlay {  
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;  
+            background: rgba(255,255,255,0.9); z-index: 2000;  
+            display: flex; justify-content: center; align-items: center;  
+            backdrop-filter: blur(5px);  
+        }  
+    </style>  
+</head>  
+<body>  
+
+    <div id="password-overlay">
+        <div class="login-card">
+            <h1 class="mb-2" style="font-weight: 800; color: #6366f1;"><i class="bi bi-shield-lock-fill"></i> Login</h1>
+            <p class="text-muted mb-4">HappyHome Bills Security</p>
+            
+            <div class="mb-3">
+                <input type="email" id="loginEmail" class="form-control" placeholder="Email Address">
+            </div>
+            <div class="mb-3">
+                <input type="password" id="loginPassword" class="form-control" placeholder="Password">
+            </div>
+            
+            <button id="loginBtn" class="btn btn-primary w-100 py-3 mb-2" onclick="window.handleLogin()">Sign In</button>
+            <p id="loginError" class="text-danger fw-bold small mt-2" style="display: none;">Invalid credentials</p>
+        </div>
+    </div>
+    
+    <div class="app-header">  
+        <button class="btn btn-sm btn-outline-light position-absolute top-0 end-0 m-3" onclick="window.handleLogout()" style="border-radius: 8px; display: none !important;">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+
+        <div class="container">  
+            <h1 class="app-title"><i class="bi bi-house-check-fill"></i> HappyHome</h1>  
+            <p class="app-subtitle">Billings <span id="currentYear"></span></p>  
+              
+            <ul class="nav nav-pills" id="mainTab" role="tablist">  
+                <li class="nav-item">  
+                    <button class="nav-link active" id="tab-dash" data-bs-toggle="pill" data-bs-target="#dash">Calculator</button>  
+                </li>  
+                <li class="nav-item">  
+                    <button class="nav-link" id="tab-report" data-bs-toggle="pill" data-bs-target="#report" onclick="window.loadReport()">History</button>  
+                </li>  
+            </ul>  
+        </div>  
+    </div>  
+  
+    <div class="container mt-3">  
+        <div class="tab-content">  
+              
+            <div class="tab-pane fade show active" id="dash">  
+                  
+                <div class="card mb-3">  
+                    <div class="card-header py-2">  
+                        <span><i class="bi bi-receipt-cutoff me-2"></i>Bills & Dates</span>  
+                        <span class="badge bg-primary bg-opacity-10 text-primary" id="displayBillDays">0 Days</span>  
+                    </div>  
+                    <div class="card-body p-2">  
+                        <div class="sheet-date-row">  
+                            <span class="sheet-date-label">FROM</span>
+                            <input type="date" id="billStart" class="form-control sheet-date-input" onchange="window.syncDates()">  
+                            <span class="sheet-date-label">TO</span>
+                            <input type="date" id="billEnd" class="form-control sheet-date-input" onchange="window.syncDates()">  
+                        </div>  
+  
+                        <div class="sheet-container">
+                            <div class="sheet-header">
+                                <div>Bill Item</div>
+                                <div>Amount</div>
+                                <div style="width: 28px;"></div>
+                            </div>
+                            <div id="bill-container"></div>  
+                            <button class="sheet-add-btn" onclick="window.addBillRow()">+ Add Row</button>  
+                        </div>
+  
+                        <div class="d-flex justify-content-between align-items-center px-2 py-1 bg-light rounded border border-secondary border-opacity-25">  
+                            <span style="font-size:0.8rem; font-weight:800; color: var(--light-text);">TOTAL AMOUNT</span>  
+                            <span style="font-size:1.3rem; font-weight:900; color: var(--primary-dark);" id="displayTotalBill">0.00</span>  
+                        </div>  
+                    </div>  
+                </div>  
+
+                <div class="card mb-3">  
+                    <div class="card-header py-2">  
+                        <span><i class="bi bi-people-fill me-2"></i>Breakdown</span>  
+                        <span class="badge bg-secondary rounded-pill" id="personCountBadge">...</span>  
+                    </div>  
+                    <div class="card-body p-2">  
+                        <div class="table-responsive sheet-container m-0">  
+                            <table class="bd-table">  
+                                <thead>  
+                                    <tr>  
+                                        <th style="width:14%">Name</th>  
+                                        <th style="width:24%">Dates Vacation</th>  
+                                        <th style="width:6%">Days</th>  
+                                        <th style="width:8%">Status</th>  
+                                        <th style="width:12%; text-align:right;">Base Share</th>  
+                                        <th style="width:22%; text-align:left; padding-left:10px;">Other(s)</th>  
+                                        <th style="width:14%; text-align:right;">Total Due</th>  
+                                    </tr>  
+                                </thead>  
+                                <tbody id="peopleBody">  
+                                </tbody>  
+                            </table>  
+                        </div>  
+                    </div>  
+                </div>  
+            </div> 
+
+            <div class="tab-pane fade" id="report">
+                <div class="card mb-3">  
+                    <div class="card-header py-2">  
+                        <span><i class="bi bi-clock-history me-2"></i>Saved History</span>  
+                        <button class="btn btn-sm btn-light text-primary fw-bold" onclick="window.loadReport()" style="height: 32px; padding: 0 10px;">  
+                            <i class="bi bi-arrow-repeat"></i> Refresh  
+                        </button>  
+                    </div>  
+                    <div class="card-body p-2">  
+                        <div class="table-responsive sheet-container m-0">  
+							<table class="bd-table">  
+                                <thead>  
+                                    <tr>  
+                                        <th style="width:70%; text-align:left;">Invoice Period (Click to Load)</th>  
+                                        <th style="width:30%; text-align:right; padding-right:10px;">Total Bill</th>  
+                                    </tr>  
+                                </thead>  
+                                <tbody id="reportBody"></tbody>  
+                            </table> 
+                        </div>  
+                        <div class="p-3 text-center text-muted small" id="historyStatus">  
+                            Loading history...  
+                        </div>  
+                    </div>  
+                </div>  
+            </div>  
+
+        </div>  
+    </div>
+
+    <div class="sticky-footer d-md-none">  
+        <button class="btn btn-info text-white flex-grow-1 shadow-sm" onclick="window.showRemindersModal()">  
+            <i class="bi bi-share-fill me-1"></i> Share  
+        </button>  
+        <button class="btn btn-success flex-grow-1 shadow-sm" onclick="window.submitData()">  
+            <i class="bi bi-cloud-arrow-up-fill me-1"></i> Save  
+        </button>  
+    </div>  
+      
+    <div class="container d-none d-md-flex justify-content-end gap-3 mb-5">  
+        <button class="btn btn-info text-white px-4 py-2" onclick="window.showRemindersModal()">  
+            <i class="bi bi-share-fill me-2"></i>Share Bills  
+        </button>  
+        <button class="btn btn-success px-4 py-2" onclick="window.submitData()">  
+            <i class="bi bi-cloud-upload-fill me-2"></i>Save Entry  
+        </button>  
+    </div>  
+  
+    <div class="modal fade" id="reminderModal" tabindex="-1">  
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">  
+            <div class="modal-content">  
+                <div class="modal-header">  
+                    <h5 class="modal-title fw-bold">📢 Share Bills</h5>  
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>  
+                </div>  
+                <div class="modal-body bg-light" id="reminderBody" style="padding:20px;">  
+                </div>  
+            </div>  
+        </div>  
+    </div>  
+  
+    <div id="loading-overlay">  
+        <div class="text-center">  
+            <div class="spinner-border text-primary" style="width: 3.5rem; height: 3.5rem;" role="status"></div>  
+            <p class="mt-3 fw-bold text-secondary fs-5">Syncing...</p>  
+        </div>  
+    </div>  
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>  
+    
+    <script type="module" src="app.js"></script>  
+
+</body>  
+</html>
