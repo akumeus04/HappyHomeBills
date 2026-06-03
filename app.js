@@ -188,15 +188,18 @@ window.getDaysDiff = function(d1, d2) {
         const endParts = d2.split('-');  
         if(startParts.length < 3 || endParts.length < 3) return 0;
 
-        const diffTime = new Date(endParts[0], endParts[1]-1, endParts[2]) - new Date(startParts[0], startParts[1]-1, startParts[2]);  
+        const dStart = Date.UTC(startParts[0], startParts[1]-1, startParts[2]);
+        const dEnd = Date.UTC(endParts[0], endParts[1]-1, endParts[2]);  
+        
+        const diffTime = dEnd - dStart;
         if(isNaN(diffTime)) return 0;
 
-        const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        const days = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
         return days > 0 ? days : 0;
     } catch(e) {
         return 0;
     }
-}  
+}
 
 window.calculateAll = function() {  
     try {
@@ -218,15 +221,25 @@ window.calculateAll = function() {
         const rows = document.querySelectorAll('#peopleBody tr');
         const personCount = rows.length;
 
-        let rowStates = [];
+let rowStates = [];
         rows.forEach((row, index) => {  
             const vStart = row.querySelector('.p-date-from').value;
             const vEnd = row.querySelector('.p-date-to').value;
             
-            // Calculate how many days they were absent/on vacation
-            const absentDays = window.getDaysDiff(vStart, vEnd);  
+            let absentDays = 0;
+
+            if (vStart && vEnd) {
+                // "Clamp" the vacation dates so they don't exceed the billing start/end
+                const clampedStart = (vStart < billStart) ? billStart : vStart;
+                const clampedEnd = (vEnd > billEnd) ? billEnd : vEnd;
+
+                // Calculate absent days ONLY if the clamped dates are valid
+                if (clampedStart <= clampedEnd) {
+                    absentDays = window.getDaysDiff(clampedStart, clampedEnd);
+                }
+            }
             
-            // Active days = Total Bill Days minus Absent Days
+            // Consumed Days = Total Billing Days MINUS Absent Days
             const pDays = Math.max(0, billDays - absentDays);  
             
             row.querySelector('.p-days').value = pDays;  
