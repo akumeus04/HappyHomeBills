@@ -482,7 +482,7 @@ window.showRemindersModal = function() {
             </div>  
             <div class="receipt-body">  
                 <div class="receipt-row"><span>Period:</span> <span>${start} to ${end}</span></div>  
-                <div class="receipt-row"><span>Dates Stayed:</span> <span>${pStart} to ${pEnd}</span></div>  
+                <div class="receipt-row"><span>Vacation Dates:</span> <span>${pStart} to ${pEnd}</span></div>  
                 <div class="receipt-row"><span>Status:</span> <span>${status} (${days}d)</span></div>  
                 <hr class="my-2 opacity-25">  
                 <div class="receipt-row"><span>Base Share:</span> <span>${share}</span></div>  
