@@ -4,13 +4,13 @@ import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from
 
 // Firebase Configuration
 const firebaseConfig = {
-    apiKey: "-",
-    authDomain: "",
-    databaseURL: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: ""
+    apiKey: "AIzaSyAc46X6MIXI-moZ2oTy2ShiDv6IrjhVQC4",
+    authDomain: "finance-app-23309.firebaseapp.com",
+    databaseURL: "https://finance-app-23309-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "finance-app-23309",
+    storageBucket: "finance-app-23309.firebasestorage.app",
+    messagingSenderId: "268979076437",
+    appId: "1:268979076437:web:204abafc00e7558f4e83dc"
 };
 
 const app = initializeApp(firebaseConfig);
