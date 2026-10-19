@@ -25,14 +25,53 @@ window.toggleLoading = function(show) {
 } 
 
 // ==========================================
-// SECURITY & AUTH ENGINE
+// SECURITY & AUTH ENGINE (SHA-256 RESTRICTED)
 // ==========================================
-onAuthStateChanged(auth, (user) => {
+
+// 🚨 Paste your 64-character SHA-256 email hash below (in lowercase)
+const ALLOWED_EMAIL_HASH = "24a8875545b9c0867169cc58a471fd522134a0c8ac795110f4111a9fbdae7d14";
+
+// Helper function: Hashes email using native Web Crypto API
+async function hashEmail(email) {
+    if (!email) return "";
+    const msgBuffer = new TextEncoder().encode(email.toLowerCase().trim());
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+onAuthStateChanged(auth, async (user) => {
     if (user) {
+        const userHash = await hashEmail(user.email || "");
+
+        // 🔒 Security Check: Compare user hash against allowed hash
+        if (userHash !== ALLOWED_EMAIL_HASH) {
+            await signOut(auth);
+            const errorMsg = document.getElementById('loginError');
+            if (errorMsg) {
+                errorMsg.innerText = "Access Denied: Account not authorized.";
+                errorMsg.style.display = 'block';
+            }
+            
+            // Ensure login screen stays visible
+            document.getElementById('password-overlay').style.display = 'flex';
+            document.getElementById('password-overlay').style.opacity = '1';
+            window.toggleLoading(false);
+            return;
+        }
+
+        // ✅ Authorized user confirmed! Fade out the overlay.
         document.getElementById('password-overlay').style.opacity = '0';
         setTimeout(() => { document.getElementById('password-overlay').style.display = 'none'; }, 500);
+        
+        const errorMsg = document.getElementById('loginError');
+        if (errorMsg) errorMsg.style.display = 'none';
+
+        // Boot up the calculator and fetch database info
         initApp();
+
     } else {
+        // 🔒 Signed Out State: Keep overlay active
         document.getElementById('password-overlay').style.display = 'flex';
         document.getElementById('password-overlay').style.opacity = '1';
         window.toggleLoading(false);
