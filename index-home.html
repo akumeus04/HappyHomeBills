@@ -88,7 +88,7 @@
         }
         .nav-pills .nav-link {
             color: rgba(255,255,255,0.7);
-            border-radius: 99px; padding: 7px 22px;
+            border-radius: 9px; padding: 7px 22px;
             font-weight: 700; font-size: 0.82rem;
             transition: all 0.2s;
         }
@@ -343,18 +343,17 @@
 </head>  
 <body>  
 
-    <!-- GOOGLE SIGN-IN OVERLAY -->
     <div id="password-overlay">
         <div class="login-card">
             <h1 class="mb-1"><i class="bi bi-shield-lock-fill"></i> Login</h1>
             <p class="text-muted mb-4" style="font-size:0.85rem;">HappyHome Bills Security</p>
-            
-            <button id="googleLoginBtn" class="btn btn-outline-dark w-100 py-3 mb-2 d-flex align-items-center justify-content-center gap-2" onclick="window.handleGoogleLogin()">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style="width: 20px; height: 20px;">
-                <span class="fw-semibold">Sign in with Google</span>
-            </button>
-            
-            <p id="loginError" class="text-danger fw-bold small mt-2" style="display: none;"></p>
+
+<button type="button" id="googleLoginBtn" class="btn w-100 py-3 mb-2" onclick="window.handleGoogleLogin()" style="background: #ffffff; color: #3c4043; border: 1px solid #dadce0; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-weight: 600;">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style="width: 20px; height: 20px;">
+    Sign in with Google
+</button>
+
+            <p id="loginError" class="text-danger fw-bold small mt-2" style="display: none;">Invalid credentials</p>
         </div>
     </div>
 
@@ -560,6 +559,7 @@
     })();
     </script>
   
+    
     <script type="module" src="app.js"></script>  
 
 </body>  

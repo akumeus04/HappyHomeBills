@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, set, get, push, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -39,31 +39,24 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-window.handleLogin = function() {
-    const email = document.getElementById('loginEmail').value;
-    const pass = document.getElementById('loginPassword').value;
+window.handleGoogleLogin = function() {
+    const provider = new GoogleAuthProvider();
     const errorMsg = document.getElementById('loginError');
-    const btn = document.getElementById('loginBtn');
-
-    if(!email || !pass) {
-        errorMsg.innerText = "Please enter email and password.";
-        errorMsg.style.display = 'block';
-        return;
-    }
+    const btn = document.getElementById('googleLoginBtn');
 
     btn.disabled = true;
     btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Signing in...`;
 
-    signInWithEmailAndPassword(auth, email, pass)
+    signInWithPopup(auth, provider)
         .then(() => {
             btn.disabled = false;
-            btn.innerText = "Sign In";
+            btn.innerHTML = `<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style="width: 20px; height: 20px;"> Sign in with Google`;
             errorMsg.style.display = 'none';
         })
-        .catch(() => {
+        .catch((error) => {
             btn.disabled = false;
-            btn.innerText = "Sign In";
-            errorMsg.innerText = "Invalid Email or Password.";
+            btn.innerHTML = `<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style="width: 20px; height: 20px;"> Sign in with Google`;
+            errorMsg.innerText = "Authentication failed: " + error.message;
             errorMsg.style.display = 'block';
         });
 }
@@ -73,10 +66,6 @@ window.handleLogout = function() {
         signOut(auth).then(() => { location.reload(); }).catch(err => alert("Error signing out: " + err.message));
     }
 }
-
-document.getElementById('loginPassword').addEventListener("keypress", function(event) {
-    if (event.key === "Enter") { window.handleLogin(); }
-});
 
 // ==========================================
 // INITIALIZATION ENGINE
